@@ -1,0 +1,49 @@
+name: Build Absensi 8 Digital APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Absensi8Digital_Android_Project.zip'
+      - '.github/workflows/build-apk.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extract project
+        run: |
+          unzip Absensi8Digital_Android_Project.zip
+          ls -la Absensi8Digital_Android
+
+      - name: Build APK
+        working-directory: Absensi8Digital_Android
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Absensi8Digital-APK
+          path: Absensi8Digital_Android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
